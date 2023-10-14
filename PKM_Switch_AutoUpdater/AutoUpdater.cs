@@ -90,7 +90,8 @@ namespace PKM_Switch_AutoUpdater
 
                 // Adjusted file name based on preRelease
                 var releaseType = preRelease ? "Pre" : "Latest";
-                var fileName = $"{owner}_{repo}_v{versionNumber}-{releaseType}-Release.zip";
+                //var fileName = $"{repo}_{versionNumber}-{releaseType}-Release.zip";
+                var fileName = $"{repo}_{versionNumber}.zip";
 
                 var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
                 await File.WriteAllBytesAsync(filePath, assetBytes);

@@ -12,8 +12,8 @@ namespace PKM_Switch_AutoUpdater
     {
         private static readonly HttpClient HttpClient = new();
         private readonly List<string> logsList = new();
-        // private int totalDownloads;
-        // private int completedDownloads;
+        private int totalDownloads;
+        private int completedDownloads;
 
         public AutoUpdater() { InitializeComponent(); }
 
@@ -25,10 +25,13 @@ namespace PKM_Switch_AutoUpdater
         private async void AMS_HEK_DownloadButton(object sender, EventArgs e)
         {
             var SuccessfulDownloads = new List<string>();
+            totalDownloads = 4;
+            completedDownloads = 0;
 
             await CollectDownloads(SuccessfulDownloads, "Atmosphere-NX", "Atmosphere", true);
             await CollectDownloads(SuccessfulDownloads, "Atmosphere-NX", "Atmosphere");
             await CollectDownloads(SuccessfulDownloads, "CTCaer", "hekate");
+            await CollectDownloads(SuccessfulDownloads, "olliz0r", "sys-botbase");
 
             var message = string.Join(Environment.NewLine, SuccessfulDownloads);
             if (!string.IsNullOrEmpty(message))
@@ -40,8 +43,10 @@ namespace PKM_Switch_AutoUpdater
         private async void PokeViewer_DownloadButton(object sender, EventArgs e)
         {
             var SuccessfulDownloads = new List<string>();
+            totalDownloads = 1;
+            completedDownloads = 0;
+
             await CollectDownloads(SuccessfulDownloads, "zyro670", "PokeViewer.NET");
-            // await CollectDownloads(SuccessfulDownloads, "zyro670", "NotForkBot.NET");
 
             var message = string.Join(Environment.NewLine, SuccessfulDownloads);
 
@@ -51,11 +56,29 @@ namespace PKM_Switch_AutoUpdater
             }
         }
 
-        private async void PKHeX_ALM_DownloadButton(object sender, EventArgs e)
+        private async void PKHeX_ALM_Official_DownloadButton(object sender, EventArgs e)
         {
             var SuccessfulDownloads = new List<string>();
-            //await CollectDownloads(SuccessfulDownloads, "kwsch", "PKHeX");
+            totalDownloads = 1;
+            completedDownloads = 0;
+
             await CollectDownloads(SuccessfulDownloads, "architdate", "PKHeX-Plugins");
+
+            var message = string.Join(Environment.NewLine, SuccessfulDownloads);
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                MessageBox.Show($"Downloaded:{Environment.NewLine}{message}", "Download Status", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private async void PKHeX_ALM_Santacrab2_DownloadButton(object sender, EventArgs e)
+        {
+            var SuccessfulDownloads = new List<string>();
+            totalDownloads = 1;
+            completedDownloads = 0;
+
+            await CollectDownloads(SuccessfulDownloads, "santacrab2", "PKHeX-Plugins");
 
             var message = string.Join(Environment.NewLine, SuccessfulDownloads);
 
@@ -88,9 +111,7 @@ namespace PKM_Switch_AutoUpdater
                 var downloadUrl = response[startIndex..endIndex];
                 var assetBytes = await HttpClient.GetByteArrayAsync(downloadUrl);
 
-                // Adjusted file name based on preRelease
                 var releaseType = preRelease ? "Pre" : "Latest";
-                //var fileName = $"{repo}_{versionNumber}-{releaseType}-Release.zip";
                 var fileName = $"{repo}_{versionNumber}.zip";
 
                 var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
@@ -107,7 +128,6 @@ namespace PKM_Switch_AutoUpdater
 
                     var fuseeBytes = await HttpClient.GetByteArrayAsync(fuseeDownloadUrl);
 
-                    // Adjusted file name based on preRelease
                     var fuseeFileName = $"Atmosphere_v{versionNumber}.bin";
                     var fuseeFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fuseeFileName);
                     await File.WriteAllBytesAsync(fuseeFilePath, fuseeBytes);
@@ -116,8 +136,8 @@ namespace PKM_Switch_AutoUpdater
                     Log($"Downloaded: {fuseeFilePath}");
                 }
 
-                // completedDownloads++;
-                // UpdateProgressBar();
+                completedDownloads++;
+                UpdateProgressBar();
             }
             catch (Exception ex)
             {
@@ -126,11 +146,11 @@ namespace PKM_Switch_AutoUpdater
             }
         }
 
-        // private void UpdateProgressBar()
-        // {
-        //     int progress = (int)(((double)completedDownloads / totalDownloads) * 100);
-        //     progressBar.Value = progress;
-        // }
+        private void UpdateProgressBar()
+        {
+            int progress = (int)(((double)completedDownloads / totalDownloads) * 100);
+            progressBar.Value = progress;
+        }
 
         private void Log(string logMessage)
         {
